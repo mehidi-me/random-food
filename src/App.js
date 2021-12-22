@@ -134,7 +134,7 @@ function App() {
                     </div>
                   </>
                 ) : (
-                  <Skeleton width={400} height={60} />
+                  <Skeleton width={350} height={60} />
                 )}
               </form>
               <div className="col-span-6 sm:col-span-4 sm:w-96 w-full mx-auto my-4">
