@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import "react-responsive-modal/styles.css";
+import { Modal } from "react-responsive-modal";
+import LiteYouTubeEmbed from "react-lite-youtube-embed";
+import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
 
 function App() {
   const [category, setCategory] = useState([]);
@@ -12,6 +16,10 @@ function App() {
 
   const [allFood, setAllFood] = useState([]);
   const [allfoodloading, setallfoodloading] = useState(true);
+
+  const [foodDetails, setFoodDetails] = useState({});
+  const [fdloading, setfdloading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   const getCategory = async () => {
     try {
@@ -89,6 +97,19 @@ function App() {
     setFood(data);
   };
 
+  const getFoodDetails = async (id) => {
+    setIsOpen(true);
+    setfdloading(true);
+    const res = await fetch(
+      `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`
+    );
+    const data = await res.json();
+    if (data.meals.length) {
+      setFoodDetails(data.meals[0]);
+    }
+    setfdloading(false);
+  };
+
   useEffect(() => {
     getCategory();
   }, []);
@@ -111,7 +132,7 @@ function App() {
           <div className="container mx-auto px-6">
             <div>
               <form
-                className="sm:flex items-center bg-white text-center sm:w-96 w-full mx-auto"
+                className="flex items-center bg-white text-center sm:w-96 w-full mx-auto"
                 onSubmit={getRandomFood}
               >
                 {!allfoodloading ? (
@@ -134,7 +155,7 @@ function App() {
                     </div>
                   </>
                 ) : (
-                  <Skeleton width={350} height={60} />
+                  <Skeleton width={300} height={60} />
                 )}
               </form>
               <div className="col-span-6 sm:col-span-4 sm:w-96 w-full mx-auto my-4">
@@ -285,7 +306,7 @@ function App() {
                     <div className="px-5 py-3 flex items-center justify-center flex-col">
                       <h3 className="text-gray-700 ">{v.strMeal}</h3>
                       <button
-                        onClick={() => alert("i will set next update")}
+                        onClick={() => getFoodDetails(v.idMeal)}
                         className=" pl-5 pr-5 bg-green-500 text-gray-100 text-lg rounded-lg focus:border-4 border-green-300 my-1"
                       >
                         Details
@@ -379,6 +400,170 @@ function App() {
           <p className="py-2 text-gray-500 sm:py-0">All rights reserved</p>
         </div>
       </footer>
+
+      <Modal
+        //trigger={<button className="button"> Open Modal </button>}
+
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        style={{ maxHeight: "90vh", overflowX: "hidden" }}
+      >
+        <div className="modal">
+          {/* <button className="close" onClick={() => setIsOpen(false)}>
+            &times;
+          </button> */}
+          {fdloading ? (
+            <>
+              <h2 className="sm:text-2xl text-xl font-semibold header">
+                <Skeleton width={200} height={20} />
+              </h2>
+              <div className="mt-4">
+                <ul>
+                  <Skeleton count={2} />
+                </ul>
+                <div className="flex items-end justify-end h-96 w-full bg-cover mt-4 rounded-md overflow-hidden">
+                  <Skeleton height={384} width={1000} />
+                </div>
+                <h3 className="text-center text-xl pt-4 font-semibold">
+                  Ingredients
+                </h3>
+                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
+                  <div className="w-full max-w-sm mx-auto rounded-md shadow-md overflow-hidden">
+                    <div className="flex items-end justify-end h-56 w-full bg-cover">
+                      <Skeleton
+                        className="w-full h-56"
+                        height="224"
+                        width={400}
+                      />
+                    </div>
+                    <div className="px-5 py-3 flex items-center justify-center flex-col">
+                      <Skeleton width={100} />
+                    </div>
+                  </div>
+                  <div className="w-full max-w-sm mx-auto rounded-md shadow-md overflow-hidden">
+                    <div className="flex items-end justify-end h-56 w-full bg-cover">
+                      <Skeleton
+                        className="w-full h-56"
+                        height="224"
+                        width={400}
+                      />
+                    </div>
+                    <div className="px-5 py-3 flex items-center justify-center flex-col">
+                      <Skeleton width={100} />
+                    </div>
+                  </div>
+                  <div className="w-full max-w-sm mx-auto rounded-md shadow-md overflow-hidden">
+                    <div className="flex items-end justify-end h-56 w-full bg-cover">
+                      <Skeleton
+                        className="w-full h-56"
+                        height="224"
+                        width={400}
+                      />
+                    </div>
+                    <div className="px-5 py-3 flex items-center justify-center flex-col">
+                      <Skeleton width={100} />
+                    </div>
+                  </div>
+                  <div className="w-full max-w-sm mx-auto rounded-md shadow-md overflow-hidden">
+                    <div className="flex items-end justify-end h-56 w-full bg-cover">
+                      <Skeleton
+                        className="w-full h-56"
+                        height="224"
+                        width={400}
+                      />
+                    </div>
+                    <div className="px-5 py-3 flex items-center justify-center flex-col">
+                      <Skeleton width={100} />
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-center text-xl pt-4 font-semibold">
+                  Instructions
+                </h3>
+                <div className="content">
+                  {" "}
+                  <Skeleton />
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className="sm:text-2xl text-xl font-semibold header">
+                {foodDetails.strMeal}
+              </h2>
+              <div className="mt-4">
+                <ul>
+                  {foodDetails.strCategory ? (
+                    <li>
+                      Category: <b>{foodDetails.strCategory}</b>
+                    </li>
+                  ) : null}
+                  {foodDetails.strArea ? (
+                    <li>
+                      Area: <b>{foodDetails.strArea}</b>
+                    </li>
+                  ) : null}
+                </ul>
+                <div
+                  className="flex items-end justify-end h-96 w-full bg-cover mt-4 rounded-md overflow-hidden"
+                  style={{
+                    backgroundImage: `url("${foodDetails.strMealThumb}")`,
+                  }}
+                ></div>
+                <h3 className="text-center text-xl pt-4 font-semibold">
+                  Ingredients
+                </h3>
+                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
+                  {[...Array(20).keys()].map((v, key) => (
+                    <>
+                      {foodDetails["strMeasure" + key] &&
+                      foodDetails["strIngredient" + key] ? (
+                        <div
+                          className="w-full max-w-sm mx-auto rounded-md shadow-md overflow-hidden"
+                          key={key}
+                        >
+                          <div
+                            className="flex items-end justify-end h-56 w-full bg-cover"
+                            style={{
+                              backgroundImage: `url("https://www.themealdb.com/images/ingredients/${
+                                foodDetails["strIngredient" + key]
+                              }.png")`,
+                            }}
+                          ></div>
+                          <div className="px-5 py-3 flex items-center justify-center flex-col">
+                            <h3 className="text-gray-700 ">
+                              {foodDetails["strMeasure" + key]}
+                            </h3>
+                          </div>
+                        </div>
+                      ) : null}
+                    </>
+                  ))}
+                </div>
+                <h3 className="text-center text-xl pt-4 font-semibold">
+                  Instructions
+                </h3>
+                <div className="content">
+                  {" "}
+                  <p className="text-center">{foodDetails.strInstructions}</p>
+                </div>
+                {foodDetails.strYoutube ? (
+                  <>
+                    <h3 className="text-center text-xl pt-4 font-semibold">
+                      Youtube Video
+                    </h3>
+                    <div className="mx-auto">
+                      <LiteYouTubeEmbed
+                        id={foodDetails.strYoutube.split("=")[1]}
+                      />
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
     </>
   );
 }
